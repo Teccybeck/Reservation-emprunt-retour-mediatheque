@@ -29,8 +29,6 @@ public class AppliClientEmpruntRetour {
 
     private static void Emprunter(BufferedReader clavier) throws IOException {
         Socket socketEmprunt = new Socket(host, portEmprunt);
-        Socket socketReservation = new Socket(host, portReservation);
-        Socket socketRetour = new Socket(host, portRetour);
 
         BufferedReader sInEmprunt = new BufferedReader(new InputStreamReader(socketEmprunt.getInputStream()));
         PrintWriter sOutEmprunt = new PrintWriter(socketEmprunt.getOutputStream(), true);
@@ -56,8 +54,6 @@ public class AppliClientEmpruntRetour {
 
     private static void Retourner(BufferedReader clavier) throws IOException {
         Socket socketRetour = new Socket(host, portRetour);
-        Socket socketReservation = new Socket(host, portReservation);
-        Socket socketEmprunt = new Socket(host, portEmprunt);
 
         BufferedReader sInRetour = new BufferedReader(new InputStreamReader(socketRetour.getInputStream()));
         PrintWriter sOutRetour = new PrintWriter(socketRetour.getOutputStream(), true);

@@ -13,8 +13,6 @@ public class AppliClientReservation {
     public static void main(String[] args) {
         try{
             Socket socketReservation = new Socket(host, portReservation);
-            Socket socketEmprunt = new Socket(host, portEmprunt);
-            Socket socketRetour = new Socket(host, portRetour);
 
             BufferedReader sInReservation = new BufferedReader(new InputStreamReader(socketReservation.getInputStream()));
             PrintWriter sOutReservation = new PrintWriter(socketReservation.getOutputStream(), true);

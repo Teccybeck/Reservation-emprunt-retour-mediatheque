@@ -23,12 +23,12 @@ public class Serveur implements Runnable{
             System.err.println("lancement du port "+ this.serveurEmprunt.getLocalPort());
             System.err.println("lancement du port "+ this.serveurRetour.getLocalPort());
             while(true){
-                Socket socketReservation = serveurReservation.accept();
-                Socket socketEmprunt = serveurEmprunt.accept();
-                Socket socketRetour = serveurRetour.accept();
-                new Thread(new ServiceRevervation(socketReservation)).start();
-                new Thread(new ServiceEmprunt(socketEmprunt)).start();
-                new Thread(new ServiceRetour(socketRetour)).start();
+                //Socket socketReservation = serveurReservation.accept();
+                //Socket socketEmprunt = serveurEmprunt.accept();
+                //Socket socketRetour = serveurRetour.accept();
+                new Thread(new ServiceRevervation(serveurReservation.accept())).start();
+                new Thread(new ServiceEmprunt(serveurEmprunt.accept())).start();
+                new Thread(new ServiceRetour(serveurRetour.accept())).start();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
