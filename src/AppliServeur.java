@@ -1,6 +1,4 @@
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 public class AppliServeur {
     private static final BaseDeDonnee bd = new BaseDeDonnee();

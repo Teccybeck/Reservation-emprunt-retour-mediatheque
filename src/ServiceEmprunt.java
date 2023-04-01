@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ServiceEmprunt implements Runnable{
     private Socket socket;
@@ -47,10 +48,18 @@ public class ServiceEmprunt implements Runnable{
                 }
             }
             AppliServeur.accesBD().EmprunterDVD(numeroDVD,numeroAbonne);
+
+            ArrayList<TimerReservation> lesTimers = AppliServeur.accesBD().getLesTimers();
+            for(TimerReservation t : lesTimers){
+                if(t.getNumDVD() == numeroDVD) {
+                    t.stop();
+                    break;
+                }
+            }
+
             sOut.println("Vous avez emprunté le DVD n°" + numeroDVD + ".");
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException ignored) {
         }
     }
 }

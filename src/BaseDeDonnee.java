@@ -6,6 +6,8 @@ public class BaseDeDonnee {
     private Connection connection;
     private ArrayList<DVDConcurent> DVDs;
     private ArrayList<Abonne> Abonnes;
+
+    private ArrayList<TimerReservation> lesTimers;
     public BaseDeDonnee() {
         try{
             Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");//Loading Driver
@@ -13,9 +15,9 @@ public class BaseDeDonnee {
             System.out.println("Connected Successfully");
             DVDs = this.getDVD();
             Abonnes = this.getAbonnes();
+            lesTimers = new ArrayList<>();
         }catch(Exception e){
             System.out.println("Error in connection");
-
         }
     }
 
@@ -61,117 +63,158 @@ public class BaseDeDonnee {
     }
 
     public String selectCatalogue(){
-        String res = "";
-        for(int i = 0; i < DVDs.size(); i++){
-            if(DVDs.get(i).estLibre())
-                res += DVDs.get(i).toString() + "\n";
+        synchronized (this){
+            String res = "";
+            for(int i = 0; i < DVDs.size(); i++){
+                if(DVDs.get(i).estLibre())
+                    res += DVDs.get(i).toString() + "\n";
+            }
+            return res;
         }
-        return res;
     }
 
     public boolean verifAbonneExist(int IdAbonne){
-        for(Abonne a : Abonnes){
-            if(a.getIdAbonne() == IdAbonne)
-                return true;
+        synchronized (this){
+            for(Abonne a : Abonnes){
+                if(a.getIdAbonne() == IdAbonne)
+                    return true;
+            }
+            return false;
         }
-        return false;
     }
 
     public boolean verifDVDExist(int id){
-        for(DVDConcurent dvd : DVDs){
-            if(dvd.numero() == id)
-                return true;
+        synchronized (this) {
+            for(DVDConcurent dvd : DVDs){
+                if(dvd.numero() == id)
+                    return true;
+            }
+            return false;
         }
-        return false;
     }
 
     public boolean verifAdulte(int idDVD, int Age){
-        for(DVDConcurent dvd : DVDs){
-            if(dvd.numero() == idDVD){
-                if(dvd.isAdulte() && Age < 16)
-                    return false;
+        synchronized (this) {
+            for(DVDConcurent dvd : DVDs){
+                if(dvd.numero() == idDVD){
+                    if(dvd.isAdulte() && Age < 16)
+                        return false;
+                }
             }
+            return true;
         }
-        return true;
     }
 
     public boolean verifDVDLibre(int id){
-        for(DVDConcurent dvd : DVDs){
-            if(dvd.numero() == id)
-                return dvd.estLibre();
+        synchronized (this){
+            for(DVDConcurent dvd : DVDs){
+                if(dvd.numero() == id)
+                    return dvd.estLibre();
+            }
+            return false;
         }
-        return false;
     }
 
     public void reserverDVD(int idDVD, int idAbonne){
         Abonne abonne = null;
-        for(Abonne a : Abonnes){
-            if(a.getIdAbonne()==idAbonne)
-                abonne = a;
-        }
-        for(DVDConcurent dvd : DVDs){
-            if(dvd.numero() == idDVD)
-                dvd.reservationPour(abonne);
+        synchronized (this) {
+            for(Abonne a : Abonnes){
+                if(a.getIdAbonne()==idAbonne){
+                    abonne = a;
+                    break;
+                }
+            }
+            for(DVDConcurent dvd : DVDs){
+                if(dvd.numero() == idDVD){
+                    dvd.reservationPour(abonne);
+                    break;
+                }
+            }
         }
     }
 
     public boolean verifDVDReserve(int id){
-        for(DVDConcurent dvd : DVDs){
-            if(dvd.numero() == id){
-                return dvd.estReserve();
+        synchronized (this){
+            for(DVDConcurent dvd : DVDs){
+                if(dvd.numero() == id){
+                    return dvd.estReserve();
+                }
             }
+            return false;
         }
-        return false;
     }
 
     public void libererDVD(int idDVD){
-        for(DVDConcurent dvd : DVDs){
-            if(dvd.numero() == idDVD){
-                dvd.retour();
+        synchronized (this){
+            for(DVDConcurent dvd : DVDs){
+                if(dvd.numero() == idDVD){
+                    dvd.retour();
+                    break;
+                }
             }
         }
     }
 
     public int getAgeById(int id){
-        for(Abonne a : Abonnes){
-            if(a.getIdAbonne() == id)
-                return a.getAge();
+        synchronized (this){
+            for(Abonne a : Abonnes){
+                if(a.getIdAbonne() == id)
+                    return a.getAge();
+            }
+            return 0;
         }
-        return 0;
     }
 
     public boolean verifEmprunt(int IdDVD, int IdAbonne) {
-        for(DVDConcurent dvd : DVDs){
-            if(dvd.numero() == IdDVD){
-                if(dvd.estLibre())
-                    return true;
-                else if(!dvd.estEmprunte()){
-                    if(dvd.reserveur() != null){
-                        if(dvd.reserveur().getIdAbonne() == IdAbonne)
-                            return true;
+        synchronized (this) {
+            for(DVDConcurent dvd : DVDs){
+                if(dvd.numero() == IdDVD){
+                    if(dvd.estLibre())
+                        return true;
+                    else if(!dvd.estEmprunte()){
+                        if(dvd.reserveur() != null){
+                            if(dvd.reserveur().getIdAbonne() == IdAbonne)
+                                return true;
+                        }
                     }
                 }
             }
+            return false;
         }
-        return false;
     }
 
     public void EmprunterDVD(int IdDVD, int IdAbonne){
         Abonne abonne = null;
-        for(Abonne a : Abonnes){
-            if(a.getIdAbonne()==IdAbonne)
-                abonne = a;
-        }
-        for(DVDConcurent dvd : DVDs){
-            if(dvd.numero() == IdDVD)
-                dvd.empruntPar(abonne);
+        synchronized (this){
+            for(Abonne a : Abonnes){
+                if(a.getIdAbonne()==IdAbonne)
+                    abonne = a;
+            }
+            for(DVDConcurent dvd : DVDs){
+                if(dvd.numero() == IdDVD)
+                    dvd.empruntPar(abonne);
+            }
         }
     }
 
     public void RetournerDVD(int IdDVD){
-        for(DVDConcurent dvd : DVDs){
-            if(dvd.numero() == IdDVD)
-                dvd.retour();
+        synchronized (this) {
+            for(DVDConcurent dvd : DVDs){
+                if(dvd.numero() == IdDVD)
+                    dvd.retour();
+            }
         }
+    }
+
+    public ArrayList<TimerReservation> getLesTimers(){
+        return lesTimers;
+    }
+
+    public void addTimer(TimerReservation t){
+        lesTimers.add(t);
+    }
+
+    public void removeTimer(TimerReservation t){
+        lesTimers.remove(t);
     }
 }

@@ -14,6 +14,7 @@ public class AppliClientReservation {
         try{
             Socket socketReservation = new Socket(host, portReservation);
 
+
             BufferedReader sInReservation = new BufferedReader(new InputStreamReader(socketReservation.getInputStream()));
             PrintWriter sOutReservation = new PrintWriter(socketReservation.getOutputStream(), true);
 
@@ -36,6 +37,11 @@ public class AppliClientReservation {
                 text = sInReservation.readLine();
             }
             System.out.println(sInReservation.readLine());
+            socketReservation.close();
+            Socket socketEmprunt = new Socket(host, portEmprunt);
+            socketEmprunt.close();
+            Socket socketRetour = new Socket(host, portRetour);
+            socketRetour.close();
 
         }catch(IOException e){
             e.printStackTrace();

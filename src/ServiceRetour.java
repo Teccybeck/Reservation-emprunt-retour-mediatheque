@@ -26,8 +26,12 @@ public class ServiceRetour implements Runnable{
                     sOut.println("Numéro de DVD invalide, veuillez en choisir un existant.");
                     numeroDVD = Integer.parseInt(sIn.readLine());
                 }
-                else if(!AppliServeur.accesBD().verifDVDLibre(numeroDVD)) {
+                else if(AppliServeur.accesBD().verifDVDLibre(numeroDVD)) {
                     sOut.println("Le DVD choisis est déjà libre.");
+                    numeroDVD = Integer.parseInt(sIn.readLine());
+                }
+                else if(AppliServeur.accesBD().verifDVDReserve(numeroDVD)){
+                    sOut.println("Le DVD choisis est réservé, il ne peut pas être retourné.");
                     numeroDVD = Integer.parseInt(sIn.readLine());
                 }
                 else{
@@ -38,8 +42,7 @@ public class ServiceRetour implements Runnable{
             AppliServeur.accesBD().RetournerDVD(numeroDVD);
             sOut.println("Vous avez retourner le DVD n°" + numeroDVD + ".");
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException ignored) {
         }
     }
 }

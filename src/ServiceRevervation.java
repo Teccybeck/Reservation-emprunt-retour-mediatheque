@@ -47,14 +47,13 @@ public class ServiceRevervation implements Runnable{
             AppliServeur.accesBD().reserverDVD(numeroDVD,numeroAbonne);
             sOut.println("Votre DVD est réservé pendant 2h.");
 
-            Thread.sleep(tempsReservation);
+            new Thread(new TimerReservation(10000,numeroDVD)).start();
 
-            if(AppliServeur.accesBD().verifDVDReserve(numeroDVD)){
-                AppliServeur.accesBD().libererDVD(numeroDVD);
-            }
+            sIn.close();
+            sOut.close();
+            socket.close();
 
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (IOException ignored) {
         }
     }
 }

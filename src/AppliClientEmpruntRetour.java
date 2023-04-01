@@ -28,6 +28,8 @@ public class AppliClientEmpruntRetour {
     }
 
     private static void Emprunter(BufferedReader clavier) throws IOException {
+        Socket socketReservation = new Socket(host, portReservation);
+        socketReservation.close();
         Socket socketEmprunt = new Socket(host, portEmprunt);
 
         BufferedReader sInEmprunt = new BufferedReader(new InputStreamReader(socketEmprunt.getInputStream()));
@@ -50,9 +52,19 @@ public class AppliClientEmpruntRetour {
             text = sInEmprunt.readLine();
         }
         System.out.println(sInEmprunt.readLine());
+
+        socketEmprunt.close();
+
+        Socket socketRetour = new Socket(host, portRetour);
+        socketRetour.close();
+
     }
 
     private static void Retourner(BufferedReader clavier) throws IOException {
+        Socket socketReservation = new Socket(host, portReservation);
+        socketReservation.close();
+        Socket socketEmprunt = new Socket(host, portEmprunt);
+        socketEmprunt.close();
         Socket socketRetour = new Socket(host, portRetour);
 
         BufferedReader sInRetour = new BufferedReader(new InputStreamReader(socketRetour.getInputStream()));
@@ -67,8 +79,8 @@ public class AppliClientEmpruntRetour {
             line = clavier.readLine();
             sOutRetour.println(line);
             text = sInRetour.readLine();
-            System.out.println(text + "^^");
         }
         System.out.println(sInRetour.readLine());
+        socketRetour.close();
     }
 }

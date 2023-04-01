@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 
 public class Serveur implements Runnable{
     private static final int portReservation = 3000;
@@ -18,20 +17,19 @@ public class Serveur implements Runnable{
 
     @Override
     public void run() {
-        try {
-            System.err.println("lancement du port "+ this.serveurReservation.getLocalPort());
-            System.err.println("lancement du port "+ this.serveurEmprunt.getLocalPort());
-            System.err.println("lancement du port "+ this.serveurRetour.getLocalPort());
-            while(true){
-                //Socket socketReservation = serveurReservation.accept();
-                //Socket socketEmprunt = serveurEmprunt.accept();
-                //Socket socketRetour = serveurRetour.accept();
-                new Thread(new ServiceRevervation(serveurReservation.accept())).start();
-                new Thread(new ServiceEmprunt(serveurEmprunt.accept())).start();
-                new Thread(new ServiceRetour(serveurRetour.accept())).start();
+        while(true){
+            try {
+                System.err.println("lancement du port "+ this.serveurReservation.getLocalPort());
+                System.err.println("lancement du port "+ this.serveurEmprunt.getLocalPort());
+                System.err.println("lancement du port "+ this.serveurRetour.getLocalPort());
+                while(true){
+                    new Thread(new ServiceRevervation(serveurReservation.accept())).start();
+                    new Thread(new ServiceEmprunt(serveurEmprunt.accept())).start();
+                    new Thread(new ServiceRetour(serveurRetour.accept())).start();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }
