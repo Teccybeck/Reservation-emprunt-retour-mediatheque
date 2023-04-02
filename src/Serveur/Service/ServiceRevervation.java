@@ -20,44 +20,45 @@ public class ServiceRevervation implements Runnable{
     @Override
     public void run() {
         try {
-            sOut.println(AppliServeur.accesBD().selectCatalogue());
-            int numeroAbonne = -1;
-            do{
-                sOut.println("Quel est votre numéro d'abonné ?");
-                numeroAbonne = Integer.parseInt(sIn.readLine());
-            } while(!AppliServeur.accesBD().verifAbonneExist(numeroAbonne));
+            synchronized (AppliServeur.accesBD()){
+                sOut.println(AppliServeur.accesBD().selectCatalogue());
+                int numeroAbonne = -1;
+                do{
+                    sOut.println("Quel est votre numéro d'abonné ?");
+                    numeroAbonne = Integer.parseInt(sIn.readLine());
+                } while(!AppliServeur.accesBD().verifAbonneExist(numeroAbonne));
 
-            sOut.println("Quel Serveur.Donnees.DVD souhaitez-vous réserver ?");
-            int numeroDVD = Integer.parseInt(sIn.readLine());
+                sOut.println("Quel DVD souhaitez-vous réserver ?");
+                int numeroDVD = Integer.parseInt(sIn.readLine());
 
-            boolean verifDVD = false;
-            while(!verifDVD){
-                if(!AppliServeur.accesBD().verifDVDExist(numeroDVD)){
-                    sOut.println("Numéro de Serveur.Donnees.DVD invalide, veuillez en choisir un existant.");
-                    numeroDVD = Integer.parseInt(sIn.readLine());
+                boolean verifDVD = false;
+                while(!verifDVD){
+                    if(!AppliServeur.accesBD().verifDVDExist(numeroDVD)){
+                        sOut.println("Numéro de DVD invalide, veuillez en choisir un existant.");
+                        numeroDVD = Integer.parseInt(sIn.readLine());
+                    }
+                    else if(!AppliServeur.accesBD().verifAdulte(numeroDVD, AppliServeur.accesBD().getAgeById(numeroAbonne))){
+                        sOut.println("Vous n'avez pas l'age requis pour ce DVD, veuillez en choisir un nouveau.");
+                        numeroDVD = Integer.parseInt(sIn.readLine());
+                    }
+                    else if(!AppliServeur.accesBD().verifDVDLibre(numeroDVD)) {
+                        sOut.println("Le DVD choisis n'est pas disponible.");
+                        numeroDVD = Integer.parseInt(sIn.readLine());
+                    }
+                    else{
+                        verifDVD = true;
+                        sOut.println("¨");
+                    }
                 }
-                else if(!AppliServeur.accesBD().verifAdulte(numeroDVD, AppliServeur.accesBD().getAgeById(numeroAbonne))){
-                    sOut.println("Vous n'avez pas l'age requis pour ce Serveur.Donnees.DVD, veuillez en choisir un nouveau.");
-                    numeroDVD = Integer.parseInt(sIn.readLine());
-                }
-                else if(!AppliServeur.accesBD().verifDVDLibre(numeroDVD)) {
-                    sOut.println("Le Serveur.Donnees.DVD choisis n'est pas disponible.");
-                    numeroDVD = Integer.parseInt(sIn.readLine());
-                }
-                else{
-                    verifDVD = true;
-                    sOut.println("¨");
-                }
+                AppliServeur.accesBD().reserverDVD(numeroDVD,numeroAbonne);
+                sOut.println("Votre DVD est réservé pendant 2h.");
+
+                new Thread(new TimerReservation(10000,numeroDVD)).start();
+
+                sIn.close();
+                sOut.close();
+                socket.close();
             }
-            AppliServeur.accesBD().reserverDVD(numeroDVD,numeroAbonne);
-            sOut.println("Votre Serveur.Donnees.DVD est réservé pendant 2h.");
-
-            new Thread(new TimerReservation(10000,numeroDVD)).start();
-
-            sIn.close();
-            sOut.close();
-            socket.close();
-
         } catch (IOException ignored) {
         }
     }

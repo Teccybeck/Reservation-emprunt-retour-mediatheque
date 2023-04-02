@@ -23,47 +23,48 @@ public class ServiceEmprunt implements Runnable{
     @Override
     public void run() {
         try {
-            sOut.println(AppliServeur.accesBD().selectCatalogue());
-            int numeroAbonne = -1;
-            do{
-                sOut.println("Quel est votre numéro d'abonné ?");
-                numeroAbonne = Integer.parseInt(sIn.readLine());
-            } while(!AppliServeur.accesBD().verifAbonneExist(numeroAbonne));
+            synchronized (AppliServeur.accesBD()){
+                sOut.println(AppliServeur.accesBD().selectCatalogue());
+                int numeroAbonne = -1;
+                do{
+                    sOut.println("Quel est votre numéro d'abonné ?");
+                    numeroAbonne = Integer.parseInt(sIn.readLine());
+                } while(!AppliServeur.accesBD().verifAbonneExist(numeroAbonne));
 
-            sOut.println("Quel Serveur.Donnees.DVD souhaitez-vous emprunter ?");
-            int numeroDVD = Integer.parseInt(sIn.readLine());
+                sOut.println("Quel DVD souhaitez-vous emprunter ?");
+                int numeroDVD = Integer.parseInt(sIn.readLine());
 
-            boolean verifDVD = false;
-            while(!verifDVD){
-                if(!AppliServeur.accesBD().verifDVDExist(numeroDVD)){
-                    sOut.println("Numéro de Serveur.Donnees.DVD invalide, veuillez en choisir un existant.");
-                    numeroDVD = Integer.parseInt(sIn.readLine());
+                boolean verifDVD = false;
+                while(!verifDVD){
+                    if(!AppliServeur.accesBD().verifDVDExist(numeroDVD)){
+                        sOut.println("Numéro de DVD invalide, veuillez en choisir un existant.");
+                        numeroDVD = Integer.parseInt(sIn.readLine());
+                    }
+                    else if(!AppliServeur.accesBD().verifAdulte(numeroDVD, AppliServeur.accesBD().getAgeById(numeroAbonne))){
+                        sOut.println("Vous n'avez pas l'age requis pour ce DVD, veuillez en choisir un nouveau.");
+                        numeroDVD = Integer.parseInt(sIn.readLine());
+                    }
+                    else if(!AppliServeur.accesBD().verifEmprunt(numeroDVD, numeroAbonne)) {
+                        sOut.println("Le DVD choisis n'est pas disponible.");
+                        numeroDVD = Integer.parseInt(sIn.readLine());
+                    }
+                    else{
+                        verifDVD = true;
+                        sOut.println("¨");
+                    }
                 }
-                else if(!AppliServeur.accesBD().verifAdulte(numeroDVD, AppliServeur.accesBD().getAgeById(numeroAbonne))){
-                    sOut.println("Vous n'avez pas l'age requis pour ce Serveur.Donnees.DVD, veuillez en choisir un nouveau.");
-                    numeroDVD = Integer.parseInt(sIn.readLine());
+                AppliServeur.accesBD().EmprunterDVD(numeroDVD,numeroAbonne);
+
+                ArrayList<TimerReservation> lesTimers = AppliServeur.accesBD().getLesTimers();
+                for(TimerReservation t : lesTimers){
+                    if(t.getNumDVD() == numeroDVD) {
+                        t.stop();
+                        break;
+                    }
                 }
-                else if(!AppliServeur.accesBD().verifEmprunt(numeroDVD, numeroAbonne)) {
-                    sOut.println("Le Serveur.Donnees.DVD choisis n'est pas disponible.");
-                    numeroDVD = Integer.parseInt(sIn.readLine());
-                }
-                else{
-                    verifDVD = true;
-                    sOut.println("¨");
-                }
+
+                sOut.println("Vous avez emprunté le DVD n°" + numeroDVD + ".");
             }
-            AppliServeur.accesBD().EmprunterDVD(numeroDVD,numeroAbonne);
-
-            ArrayList<TimerReservation> lesTimers = AppliServeur.accesBD().getLesTimers();
-            for(TimerReservation t : lesTimers){
-                if(t.getNumDVD() == numeroDVD) {
-                    t.stop();
-                    break;
-                }
-            }
-
-            sOut.println("Vous avez emprunté le Serveur.Donnees.DVD n°" + numeroDVD + ".");
-
         } catch (IOException ignored) {
         }
     }

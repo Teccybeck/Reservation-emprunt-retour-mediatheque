@@ -47,7 +47,7 @@ public class DVD implements Document{
         }
         else{
             try {
-                throw new Exception("Ce Serveur.Donnees.DVD n'est pas libre.");
+                throw new Exception("Ce DVD n'est pas libre.");
             } catch (Exception ignored) {}
         }
     }
@@ -61,13 +61,13 @@ public class DVD implements Document{
         else if(etat == "Réservé"){
             if(!(abonne == ab)){
                 try {
-                    throw new Exception("Ce Serveur.Donnees.DVD est déjà emprunté.");
+                    throw new Exception("Ce DVD est déjà emprunté.");
                 } catch (Exception ignored) {}
             }
         }
         else{
             try {
-                throw new Exception("Ce Serveur.Donnees.DVD n'est pas libre.");
+                throw new Exception("Ce DVD n'est pas libre.");
             } catch (Exception ignored) {}
         }
     }

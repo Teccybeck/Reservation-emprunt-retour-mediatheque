@@ -27,7 +27,7 @@ public class BaseDeDonnee {
 
     private ArrayList<DVDConcurent> getDVD() throws SQLException {
         ArrayList<DVDConcurent> list = new ArrayList<>();
-        String request = "Select * from Serveur.Donnees.DVD";
+        String request = "Select * from DVD";
         PreparedStatement preparedStatement=connection.prepareStatement(request);
         ResultSet resultSet=preparedStatement.executeQuery();
         int numero;
@@ -46,7 +46,7 @@ public class BaseDeDonnee {
 
     private ArrayList<Abonne> getAbonnes() throws SQLException {
         ArrayList<Abonne> list = new ArrayList<>();
-        String request = "Select * from Serveur.Donnees.Abonne";
+        String request = "Select * from Abonne";
         PreparedStatement preparedStatement=connection.prepareStatement(request);
         ResultSet resultSet=preparedStatement.executeQuery();
         int numero = 0;
